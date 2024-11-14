@@ -18,7 +18,7 @@ def show_past_transactions(): #this function when trigered will return all past 
                     line=line.strip() #remove \n from every line 
                     name, surname, ID, age, gender, product, price = line.split(",") #asign each attribute to a coresponding variable 
                     customer = customer_details(name, surname, ID, int(age), gender, product, float(price)) #make it a named tuple
-                    if not chosen or (str(getattr(customer, chosen, None)) == filter_case): #if chosen = none so there is no filter or  it retrives the attribute assosiated with the customer and if the attribute is part of the named tuple then it checks just checks if the specified atribute is the same as the filter_case and prints it if one of these is true 
+                    if not chosen or (str(getattr(customer, chosen, None)) == filter_case.lower()): #if chosen = none so there is no filter or  it retrives the attribute assosiated with the customer and if the attribute is part of the named tuple then it checks just checks if the specified atribute is the same as the filter_case and prints it if one of these is true 
                         print(customer)
                         total +=1 #increment the total by one to show how many results there are and to give a special case if none are found
                 if total == 0:
@@ -31,13 +31,26 @@ def show_past_transactions(): #this function when trigered will return all past 
 
 def add_customer():
     global customer_details #take all the details of the transations so they can write them to the file and temporarly store it as new_customer
+    gender=""
     name = input("Name: ")
     surname = input("Surname: ")
     ID = input("ID: ")
-    age = int(input("Age: "))
-    gender = input("Gender: ")
+    while True:
+        try:
+            age = int(input("Age: "))
+            break
+        except ValueError:
+            print("enter in a valid format please") #make sure we only take a valid input
+    while gender != "male" and gender != "female": #dont take an input untill it is either male or female
+        gender = input("Gender: ").lower()
     product = input("Product: ")
-    price = float(input("Price: "))
+    while True:
+        try:
+            price = float(input("Price: "))
+            break
+        except ValueError:
+            print("enter in a valid format please") #make sure we only take a valid input
+   
 
     new_customer=customer_details(name,surname,ID,age,gender,product,price)
 
