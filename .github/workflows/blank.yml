@@ -1,0 +1,66 @@
+from collections import namedtuple #import the libary we actually need
+
+customer_details=namedtuple("customer","name surname ID age gender product price") #define all the different attributes in the named tuple customer_details
+
+def show_past_transactions(): #this function when trigered will return all past customers and it will allow them to filter based of a certain atribute 
+    global filter_needed # to determine if we need a filter or not
+    total=0
+    if filter_needed == True: #if we need a filter then get the atribute we want to filter by as chosen and what we want to look for in that atribute as filter_case
+        chosen=input("what do you want to sort by: name surname ID age gender product or price? (case sensitive) ").strip()
+        filter_case=input("what do you want to look for in that filter? ").strip()
+    else:
+        chosen = None
+    while True:
+        try:
+            with open("customer_details.txt","r")as past_transactions: #open the file containing the past transactions
+                read_file=past_transactions.readlines()
+                for line in read_file:
+                    line=line.strip() #remove \n from every line 
+                    name, surname, ID, age, gender, product, price = line.split(",") #asign each attribute to a coresponding variable 
+                    customer = customer_details(name, surname, ID, int(age), gender, product, float(price)) #make it a named tuple
+                    if not chosen or (str(getattr(customer, chosen, None)) == filter_case): #if chosen = none so there is no filter or  it retrives the attribute assosiated with the customer and if the attribute is part of the named tuple then it checks just checks if the specified atribute is the same as the filter_case and prints it if one of these is true 
+                        print(customer)
+                        total +=1 #increment the total by one to show how many results there are and to give a special case if none are found
+                if total == 0:
+                    print("0 results found with this filter")
+                print("")
+                break
+        except FileNotFoundError: #if they try to run the code without adding a customer before then this will ensure it dosnt run into an error
+            with open("customer_details.txt","w"):
+                pass
+
+def add_customer():
+    global customer_details #take all the details of the transations so they can write them to the file and temporarly store it as new_customer
+    name = input("Name: ")
+    surname = input("Surname: ")
+    ID = input("ID: ")
+    age = int(input("Age: "))
+    gender = input("Gender: ")
+    product = input("Product: ")
+    price = float(input("Price: "))
+
+    new_customer=customer_details(name,surname,ID,age,gender,product,price)
+
+    with open("customer_details.txt", 'a') as details: 
+        details.write(','.join(map(str, new_customer)) + '\n') #write this new transaction to the file joining each variable with a comma so we can split it later, map() makes it itterate for every variable in new customer and finished by writing it to the file with a new line after it 
+
+while True:
+    choice=input("""what would you like to do?
+1.add a new customer
+2.view past transactions
+3.exit the program \n""") #give the menu of optiont they have
+    if choice == "1":
+        add_customer() #add a customer
+    elif choice == "2":
+        yes_or_no=input("would you like to filter by a certain atribute? ") #self explanitory
+        if yes_or_no == "yes":
+            filter_needed=True
+            show_past_transactions()
+        else:
+            filter_needed= False
+            show_past_transactions()
+    elif choice == "3":
+        print("exiting the program bye!")
+        break
+    else:
+        print("invalid input")
